@@ -1,2 +1,3 @@
 danmu>=1.0.5
+enum34>=1.1.4; python_version < '3.4'
 keyboard>=0.11.0

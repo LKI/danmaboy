@@ -2,27 +2,48 @@
 from __future__ import absolute_import, unicode_literals
 
 import time
+from enum import Enum
 
 import danmu
 import keyboard
 
 default_url = 'http://www.douyu.com/lisp'
 default_key = 'alt+8'
-default_joypad = {
-    'w': {'1', 'up', '上', '↑'},
-    's': {'2', 'down', '下', '↓'},
-    'a': {'3', 'left', '左', '←'},
-    'd': {'4', 'right', '右', '→'},
-    'g': {'5', 'a'},
-    'h': {'6', 'b'},
-    't': {'7', 'l'},
-    'y': {'8', 'r'},
-    'u': {'9', 'select', '选择'},
-    'b': {'0', 'start', '开始'},
-}
-reversed_joypad = {}
-for key, texts in default_joypad.items():
-    reversed_joypad.update({text: key for text in texts})
+default_keys = ['b', 'w', 's', 'a', 'd', 'g', 'h', 't', 'y', 'u']
+
+
+class KeyStrokes(Enum):
+    def __new__(cls, chinese, number, english):
+        obj = object.__new__(cls)
+        obj._value_ = int(number)
+        obj.chinese = chinese  # type: str
+        obj.number = number  # type: str
+        obj.english = english  # type: str
+        return obj
+
+    UP = ('上', '1', 'up')
+    DOWN = ('下', '2', 'down')
+    LEFT = ('左', '3', 'left')
+    RIGHT = ('右', '4', 'right')
+    A = ('a', '5', 'a')
+    B = ('b', '6', 'b')
+    L = ('l', '7', 'l')
+    R = ('r', '8', 'r')
+    SELECT = ('select', '9', 'select')
+    START = ('start', '0', 'start')
+
+    def real_key(self):
+        keys = default_keys
+        return keys[self.value]
+
+
+joypad = {}
+for _key in KeyStrokes:
+    joypad.update({
+        _key.chinese: _key,
+        _key.number: _key,
+        _key.english: _key,
+    })
 
 
 class DanmaBoyException(Exception):
@@ -67,13 +88,13 @@ class Gamer(object):
         if not self.started:
             return
         nickname, content = danmaku['NickName'], str(danmaku['Content']).lower()
-        if content not in reversed_joypad:
+        if content not in joypad:
             return
-        keystroke = reversed_joypad[content]
-        self.hint('{}: {} ({})'.format(nickname, keystroke, content), system=False)
-        keyboard.press(keystroke)
+        key = joypad[content]  # type: KeyStrokes
+        self.hint('{}: {} ({})'.format(nickname, key.chinese.upper(), content), system=False)
+        keyboard.press(key.real_key())
         time.sleep(0.04)
-        keyboard.release(keystroke)
+        keyboard.release(key.real_key())
 
     def next_state(self, state):
         return '结束' if state else '开始'
