@@ -1,9 +1,12 @@
+*.gba
 *.log
 *.pyc
+*.sav*
 *.swp
 *~
 
+/.gba/
+/.idea/
 /env/
 /venv/
-/.idea/
 
