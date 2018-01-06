@@ -5,6 +5,22 @@ import danmu
 import keyboard
 
 default_url = 'http://www.douyu.com/lisp'
+default_key = 'alt+8'
+default_joypad = {
+    'w': {'1', 'up', '上', '↑'},
+    's': {'2', 'down', '下', '↓'},
+    'a': {'3', 'left', '左', '←'},
+    'd': {'4', 'right', '右', '→'},
+    'g': {'5', 'a'},
+    'h': {'6', 'b'},
+    't': {'7', 'l'},
+    'y': {'8', 'r'},
+    'u': {'9', 'select', '选择'},
+    'b': {'0', 'start', '开始'},
+}
+reversed_joypad = {}
+for key, texts in default_joypad.items():
+    reversed_joypad.update({text: key for text in texts})
 
 
 class DanmaBoyException(Exception):
@@ -12,7 +28,7 @@ class DanmaBoyException(Exception):
 
 
 class Gamer(object):
-    def __init__(self, url=default_url, switch_key='alt+8'):
+    def __init__(self, url=default_url, switch_key=default_key):
         self.url = url
         self.client = danmu.DanMuClient(self.url)
         if not self.client.isValid():
@@ -48,8 +64,11 @@ class Gamer(object):
     def receive(self, danmaku):
         if not self.started:
             return
-        nickname, content = danmaku['NickName'], danmaku['Content']
-        self.hint('{}: {}'.format(nickname, content), system=False)
+        nickname, content = danmaku['NickName'], str(danmaku['Content']).lower()
+        if content not in reversed_joypad:
+            return
+        keystroke = reversed_joypad[content]
+        self.hint('{}: {} ({})'.format(nickname, keystroke, content), system=False)
 
     def next_state(self, state):
         return '结束' if state else '开始'
