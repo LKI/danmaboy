@@ -1,0 +1,9 @@
+*.log
+*.pyc
+*.swp
+*~
+
+/env/
+/venv/
+/.idea/
+
