@@ -1,1 +1,2 @@
 danmu>=1.0.5
+keyboard>=0.11.0
