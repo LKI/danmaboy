@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import time
+
 import danmu
 import keyboard
 
@@ -69,6 +71,9 @@ class Gamer(object):
             return
         keystroke = reversed_joypad[content]
         self.hint('{}: {} ({})'.format(nickname, keystroke, content), system=False)
+        keyboard.press(keystroke)
+        time.sleep(0.04)
+        keyboard.release(keystroke)
 
     def next_state(self, state):
         return '结束' if state else '开始'
